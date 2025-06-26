@@ -10,13 +10,3 @@
 @import url('../blocks/popup/popup.css');
 @import url('../blocks/popup/_is-animated/popup_is-animated.css');
 @import url('../blocks/popup/_is-opened/popup_is-opened.css');
-
-.popup_is-opened {
-  display: flex;
-  opacity: 1;
-}
-.popup_type_edit {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
