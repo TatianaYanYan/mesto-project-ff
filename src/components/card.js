@@ -23,59 +23,7 @@ export function createCard(cardData, handleDelete, handleClickImage, handleLike)
 export function handleDeleteCard(cardElement) {
   cardElement.remove();
 }
-
 //Лайк карточки
 export function handleLikeCard(button) {
   button.classList.toggle('card__like-button_is-active');
-}
-
-//Редактирование профиля
-export function handleProfileFormSubmit(profileTitle, profileDescription, popupEdit, closePopup) {
-  return function (evt) {
-    evt.preventDefault();
-
-    const nameInput = evt.target.querySelector('.popup__input_type_name');
-    const jobInput = evt.target.querySelector('.popup__input_type_description');
-
-    profileTitle.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
-
-    closePopup(popupEdit);
-  };
-}
-
-//Добавление новой карточки
-export function handleAddCardFormSubmit(
-  placesList,
-  newCardForm,
-  popupNewCard,
-  closePopup,
-  createCard,
-  handleDeleteCard,
-  handleCardImageClick,
-  handleLikeCard
-) {
-  return function (evt) {
-    evt.preventDefault();
-
-    const nameInput = newCardForm.querySelector('.popup__input_type_card-name');
-    const linkInput = newCardForm.querySelector('.popup__input_type_url');
-
-    const newCardData = {
-      name: nameInput.value,
-      link: linkInput.value,
-    };
-
-    const newCardElement = createCard(
-      newCardData,
-      handleDeleteCard,
-      handleCardImageClick,
-      handleLikeCard
-    );
-
-    placesList.prepend(newCardElement);
-
-    newCardForm.reset();
-    closePopup(popupNewCard);
-  };
 }
