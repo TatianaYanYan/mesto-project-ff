@@ -1,7 +1,7 @@
 import './pages/index.css';
 import { initialCards } from './components/cards.js';
 import { createCard, handleDeleteCard, handleLikeCard } from './components/card.js';
-import { openPopup, closePopup, addPopupEventListeners} from './components/modal.js';
+import { openPopup, closePopup} from './components/modal.js';
 
 // DOM элементы
 const placesList = document.querySelector('.places__list');
@@ -131,4 +131,30 @@ export function setModalListeners() {
   const addButton = document.querySelector('.profile__add-button');
 
   addPopupEventListeners(popupEdit, editButton, popupNewCard, addButton);
+}
+
+/**
+ * Назначаем слушатели событий для модальных окон.
+ */
+export function addPopupEventListeners(popupEdit, editButton, popupNewCard, addButton) {
+  // Открытие попапов
+  editButton.addEventListener('click', () => openPopup(popupEdit));
+  addButton.addEventListener('click', () => openPopup(popupNewCard));
+
+  // Закрытие по крестику
+  document.querySelectorAll('.popup__close').forEach(button => {
+    button.addEventListener('click', (evt) => {
+      const popup = evt.target.closest('.popup');
+      if (popup) closePopup(popup);
+    });
+  });
+
+  // Закрытие по оверлею
+  document.querySelectorAll('.popup_is-animated').forEach(popup => {
+    popup.addEventListener('click', (evt) => {
+      if (evt.target === evt.currentTarget) {
+        closePopup(evt.currentTarget);
+      }
+    });
+  });
 }
