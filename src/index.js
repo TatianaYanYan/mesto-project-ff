@@ -137,24 +137,36 @@ export function setModalListeners() {
  * Назначаем слушатели событий для модальных окон.
  */
 export function addPopupEventListeners(popupEdit, editButton, popupNewCard, addButton) {
-  // Открытие попапов
-  editButton.addEventListener('click', () => openPopup(popupEdit));
-  addButton.addEventListener('click', () => openPopup(popupNewCard));
+// Открытие попапа редактирования профиля с подстановкой данных
+editButton.addEventListener('click', () => {
+  const nameInput = popupEdit.querySelector('.popup__input_type_name');
+  const jobInput = popupEdit.querySelector('.popup__input_type_description');
 
-  // Закрытие по крестику
-  document.querySelectorAll('.popup__close').forEach(button => {
-    button.addEventListener('click', (evt) => {
-      const popup = evt.target.closest('.popup');
-      if (popup) closePopup(popup);
-    });
-  });
+  nameInput.value = profileTitle.textContent;
+  jobInput.value = profileDescription.textContent;
 
-  // Закрытие по оверлею
-  document.querySelectorAll('.popup_is-animated').forEach(popup => {
-    popup.addEventListener('click', (evt) => {
-      if (evt.target === evt.currentTarget) {
-        closePopup(evt.currentTarget);
-      }
-    });
+  openPopup(popupEdit);
+});
+
+// Открытие попапа добавления новой карточки
+addButton.addEventListener('click', () => {
+  openPopup(popupNewCard);
+});
+
+// Закрытие по крестику
+document.querySelectorAll('.popup__close').forEach(button => {
+  button.addEventListener('click', (evt) => {
+    const popup = evt.target.closest('.popup');
+    if (popup) closePopup(popup);
   });
+});
+
+// Закрытие по оверлею
+document.querySelectorAll('.popup_is-animated').forEach(popup => {
+  popup.addEventListener('click', (evt) => {
+    if (evt.target === evt.currentTarget) {
+      closePopup(evt.currentTarget);
+    }
+  });
+});
 }
