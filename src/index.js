@@ -45,22 +45,35 @@ const newCardForm = popupNewCard.querySelector('.popup__form[name="new-place"]')
 const popupUpdateAvatar = document.querySelector('.popup.popup_type_update-avatar');
 const updateAvatarForm = popupUpdateAvatar.querySelector('.popup__form[name="update-avatar"]');
 
+// Функция "Сохранение"
+export function toggleButtonLoading(button, isLoading, loadingText = 'Сохранение...') {
+  if (isLoading) {
+    button.textContent = loadingText;
+    button.disabled = true;
+  } else {
+    button.textContent = button.dataset.defaultText || 'Сохранить';
+    button.disabled = false;
+  }
+}
 // Редактирование профиля
+
 export function handleProfileFormSubmit(profileTitle, profileDescription, popupEdit, closePopup) {
   return function (evt) {
     evt.preventDefault();
-    
-    // Очистка ошибок валидации перед отправкой формы
-    clearValidation(editForm, validationConfig);
-    
+
     const nameInput = evt.target.querySelector('.popup__input_type_name');
     const jobInput = evt.target.querySelector('.popup__input_type_description');
     const newName = nameInput.value;
     const newAbout = jobInput.value;
     const submitButton = evt.target.querySelector('.popup__button');
-    const originalText = submitButton.textContent;
-    submitButton.textContent = 'Сохранение...';
-    
+
+    // Сохраняем исходный текст один раз
+    if (!submitButton.dataset.defaultText) {
+      submitButton.dataset.defaultText = submitButton.textContent;
+    }
+
+    toggleButtonLoading(submitButton, true);
+
     updateUserInfo(newName, newAbout)
       .then(userData => {
         profileTitle.textContent = userData.name;
@@ -69,7 +82,7 @@ export function handleProfileFormSubmit(profileTitle, profileDescription, popupE
       })
       .catch(err => console.error('Не удалось сохранить данные:', err))
       .finally(() => {
-        submitButton.textContent = originalText;
+        toggleButtonLoading(submitButton, false);
       });
   };
 }
@@ -87,17 +100,18 @@ export function handleAddCardFormSubmit(
 ) {
   return function (evt) {
     evt.preventDefault();
-    
-    // Очистка ошибок валидации перед отправкой формы
-    clearValidation(newCardForm, validationConfig);
-    
+
     const nameInput = newCardForm.querySelector('.popup__input_type_card-name');
     const linkInput = newCardForm.querySelector('.popup__input_type_url');
     const newCardData = { name: nameInput.value, link: linkInput.value };
     const submitButton = evt.target.querySelector('.popup__button');
-    const originalText = submitButton.textContent;
-    submitButton.textContent = 'Сохранение...';
-    
+
+    if (!submitButton.dataset.defaultText) {
+      submitButton.dataset.defaultText = submitButton.textContent;
+    }
+
+    toggleButtonLoading(submitButton, true);
+
     addNewCard(newCardData.name, newCardData.link)
       .then(cardData => {
         const newCardElement = createCard(
@@ -109,15 +123,11 @@ export function handleAddCardFormSubmit(
         );
         placesList.prepend(newCardElement);
         newCardForm.reset();
-        
-        // После сброса формы, вызываем clearValidation, чтобы кнопка оставалась неактивной
-        clearValidation(newCardForm, validationConfig);
-        
         closePopup(popupNewCard);
       })
       .catch(err => console.error('Не удалось добавить карточку:', err))
       .finally(() => {
-        submitButton.textContent = originalText;
+        toggleButtonLoading(submitButton, false);
       });
   };
 }
@@ -189,29 +199,26 @@ export function setModalListeners() {
 export function handleUpdateAvatarSubmit(avatarElement, formElement, popup, closePopup) {
   return function (evt) {
     evt.preventDefault();
-    
-    // Очистка ошибок валидации перед отправкой формы
-    clearValidation(updateAvatarForm, validationConfig);
-    
+
     const input = formElement.querySelector('.popup__input_type_avatar-url');
     const newAvatarLink = input.value;
     const submitButton = formElement.querySelector('.popup__button');
-    const originalText = submitButton.textContent;
-    submitButton.textContent = 'Сохранение...';
-    
+
+    if (!submitButton.dataset.defaultText) {
+      submitButton.dataset.defaultText = submitButton.textContent;
+    }
+
+    toggleButtonLoading(submitButton, true);
+
     updateAvatar(newAvatarLink)
       .then(userData => {
         avatarElement.style.backgroundImage = `url(${userData.avatar})`;
         closePopup(popup);
         formElement.reset();
-        
-        // После сброса формы, вызываем clearValidation, чтобы кнопка оставалась неактивной
-        clearValidation(updateAvatarForm, validationConfig);
-        
       })
       .catch(err => console.error('Не удалось обновить аватар:', err))
       .finally(() => {
-        submitButton.textContent = originalText;
+        toggleButtonLoading(submitButton, false);
       });
   };
 }
