@@ -177,6 +177,10 @@ export function setModalListeners() {
   // Открытие попапа обновления аватара
   avatarElement.addEventListener('click', () => {
     openPopup(popupUpdateAvatar);
+    // Очистка формы при открытии
+    updateAvatarForm.reset();
+    // Очистка ошибок валидации при открытии формы
+    clearValidation(updateAvatarForm, validationConfig);
   });
   
   // Закрытие по крестику и оверлею

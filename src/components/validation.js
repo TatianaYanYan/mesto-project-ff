@@ -1,4 +1,3 @@
-// validation.js
 
 // Функция проверки регулярного выражения
 function isValidPattern(inputElement, pattern, errorMessage) {
@@ -79,7 +78,6 @@ function toggleButtonState(formElement, config) {
 // Устанавливаем слушатели событий на каждую форму
 function setEventListeners(formElement, config) {
   const inputList = formElement.querySelectorAll(config.inputSelector);
-  const submitButton = formElement.querySelector(config.submitButtonSelector);
 
   inputList.forEach(inputElement => {
     inputElement.addEventListener('input', () => {
@@ -93,6 +91,15 @@ function setEventListeners(formElement, config) {
       showInputError(formElement, inputElement, config);
       toggleButtonState(formElement, config);
     });
+  });
+
+  // Блокируем отправку формы, если есть невалидные поля
+  formElement.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    const firstInvalidInput = [...inputList].find(input => !input.checkValidity());
+    if (firstInvalidInput) {
+      firstInvalidInput.focus();
+    }
   });
 }
 
