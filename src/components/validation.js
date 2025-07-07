@@ -1,61 +1,46 @@
-
 // Функция проверки регулярного выражения
-function isValidPattern(inputElement, pattern, errorMessage) {
-  const regex = new RegExp(pattern);
-  const value = inputElement.value.trim();
-
-  if (!regex.test(value)) {
-    inputElement.setCustomValidity(errorMessage);
-  } else {
-    inputElement.setCustomValidity('');
+function isValidPattern(inputElement) {
+  const pattern = inputElement.getAttribute("pattern");
+  if (pattern) {
+    const regex = new RegExp(pattern);
+    const value = inputElement.value.trim();
+    if (!regex.test(value)) {
+      inputElement.setCustomValidity(inputElement.dataset.error || "Некорректный формат");
+    } else {
+      inputElement.setCustomValidity("");
+    }
   }
 }
 
 // Получаем кастомное или стандартное сообщение об ошибке
-function getErrorMessage(inputElement, config) {
+function getErrorMessage(inputElement) {
   // Сброс стандартной ошибки, если была
-  inputElement.setCustomValidity('');
+  inputElement.setCustomValidity("");
 
-  if (inputElement.validity.valueMissing) {
-    return 'Вы пропустили это поле';
-  }
-
-  if (inputElement.validity.tooShort) {
-    return `Минимальное количество символов ${inputElement.minLength}. Длина текста сейчас: ${inputElement.value.length} символ${inputElement.value.length !== 1 ? 'а' : ''}`;
-  }
-
-  if (inputElement.validity.typeMismatch && inputElement.type === 'url') {
-    return 'Введите адрес сайта';
-  }
-
-  // Кастомная ошибка из data-error (проверка через pattern)
-  if (inputElement.dataset.error && !inputElement.checkValidity()) {
+  if (inputElement.validity.patternMismatch && inputElement.dataset.error) {
     return inputElement.dataset.error;
   }
 
-  return '';
+  return inputElement.validationMessage;
 }
 
 // Показываем ошибку
 function showInputError(formElement, inputElement, config) {
   const errorElement = formElement.querySelector(`#${inputElement.id}-error`);
-  const errorMessage = getErrorMessage(inputElement, config);
+  const errorMessage = getErrorMessage(inputElement);
 
   if (errorMessage) {
     inputElement.classList.add(config.inputErrorClass);
     errorElement.textContent = errorMessage;
     errorElement.classList.add(config.errorClass);
-  } else {
-    hideInputError(formElement, inputElement, config);
   }
 }
 
 // Скрываем ошибку
 function hideInputError(formElement, inputElement, config) {
   const errorElement = formElement.querySelector(`#${inputElement.id}-error`);
-
   inputElement.classList.remove(config.inputErrorClass);
-  errorElement.textContent = '';
+  errorElement.textContent = "";
   errorElement.classList.remove(config.errorClass);
 }
 
@@ -63,8 +48,7 @@ function hideInputError(formElement, inputElement, config) {
 function toggleButtonState(formElement, config) {
   const inputList = formElement.querySelectorAll(config.inputSelector);
   const submitButton = formElement.querySelector(config.submitButtonSelector);
-
-  const hasInvalidInput = Array.from(inputList).some(input => !input.checkValidity());
+  const hasInvalidInput = Array.from(inputList).some((input) => !input.checkValidity());
 
   if (hasInvalidInput) {
     submitButton.classList.add(config.inactiveButtonClass);
@@ -78,48 +62,33 @@ function toggleButtonState(formElement, config) {
 // Устанавливаем слушатели событий на каждую форму
 function setEventListeners(formElement, config) {
   const inputList = formElement.querySelectorAll(config.inputSelector);
-
-  inputList.forEach(inputElement => {
-    inputElement.addEventListener('input', () => {
-      // Если у элемента есть pattern, запускаем кастомную валидацию
-      if (inputElement.hasAttribute('pattern')) {
-        const pattern = new RegExp(inputElement.getAttribute('pattern'));
-        const errorMessage = inputElement.dataset.error || 'Недопустимые символы';
-        isValidPattern(inputElement, pattern, errorMessage);
+  inputList.forEach((inputElement) => {
+    inputElement.addEventListener("input", () => {
+      isValidPattern(inputElement);
+      if (!inputElement.validity.valid) {
+        showInputError(formElement, inputElement, config);
+      } else {
+        hideInputError(formElement, inputElement, config);
       }
-
-      showInputError(formElement, inputElement, config);
       toggleButtonState(formElement, config);
     });
-  });
-
-  // Блокируем отправку формы, если есть невалидные поля
-  formElement.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-    const firstInvalidInput = [...inputList].find(input => !input.checkValidity());
-    if (firstInvalidInput) {
-      firstInvalidInput.focus();
-    }
   });
 }
 
 // Очищает все ошибки и блокирует кнопку
 export function clearValidation(formElement, config) {
   const inputList = formElement.querySelectorAll(config.inputSelector);
-
-  inputList.forEach(inputElement => {
+  inputList.forEach((inputElement) => {
     hideInputError(formElement, inputElement, config);
-    inputElement.setCustomValidity('');
+    inputElement.setCustomValidity("");
   });
-
   toggleButtonState(formElement, config);
 }
 
 // Включает валидацию для всех форм
 export function enableValidation(config) {
   const formList = document.querySelectorAll(config.formSelector);
-
-  formList.forEach(formElement => {
+  formList.forEach((formElement) => {
     setEventListeners(formElement, config);
     toggleButtonState(formElement, config);
   });
